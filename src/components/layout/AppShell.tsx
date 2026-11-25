@@ -8,6 +8,7 @@ import {
   FileText,
   Globe2,
   LayoutDashboard,
+  LogOut,
   Megaphone,
   Menu,
   Settings,
@@ -16,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { useApex } from '../../context/ApexContext';
+import { useAuth } from '../../context/AuthContext';
 import { NavSection } from '../../types/apex';
 
 const NAV_ITEMS: { id: NavSection; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -43,6 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     canAccessSection,
     toastMessage,
   } = useApex();
+  const { firebaseUser, userProfile, logout } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
@@ -111,12 +114,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-800 text-xs">
-          <div className="text-slate-400">Signed in as</div>
-          <div className="font-semibold text-white truncate mt-0.5">{currentUser.name}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">
-            {currentUser.role} · {currentUser.department}
+        <div className="p-4 border-t border-slate-800 text-xs space-y-2">
+          <div>
+            <div className="text-slate-400">Authenticated Account</div>
+            <div className="font-semibold text-white truncate mt-0.5">
+              {userProfile?.fullName || firebaseUser?.displayName || currentUser.name}
+            </div>
+            <div className="text-[11px] text-slate-400 truncate">
+              {firebaseUser?.email}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              Workspace Role: {currentUser.role}
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full py-1.5 px-2.5 text-xs font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 rounded flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Sign Out
+          </button>
         </div>
       </aside>
 
@@ -201,6 +218,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-red-700 rounded-md flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
           </div>
         </header>
 

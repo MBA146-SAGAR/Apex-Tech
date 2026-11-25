@@ -123,7 +123,43 @@ export function ApexProvider({ children }: { children: React.ReactNode }) {
     }
   });
 
-  const [activeSection, setActiveSection] = useState<NavSection>('dashboard');
+  const validSections: NavSection[] = [
+    'dashboard',
+    'customers',
+    'pipeline',
+    'subscriptions',
+    'financials',
+    'analytics',
+    'marketing',
+    'validation',
+    'market',
+    'reports',
+    'settings',
+  ];
+
+  const [activeSection, setActiveSectionState] = useState<NavSection>(() => {
+    const hash = window.location.hash.replace('#', '') as NavSection;
+    return validSections.includes(hash) ? hash : 'dashboard';
+  });
+
+  const setActiveSection = (section: NavSection) => {
+    setActiveSectionState(section);
+    if (window.location.hash !== `#${section}`) {
+      window.location.hash = section;
+    }
+  };
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace('#', '') as NavSection;
+      if (validSections.includes(hash)) {
+        setActiveSectionState(hash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
